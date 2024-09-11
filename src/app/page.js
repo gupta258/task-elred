@@ -10,7 +10,6 @@ export default function Home() {
   const router = useRouter();
 
   const [data, setData] = useState();
-  const [metaData, setMetaData] = useState();
   const [moreComments, showMoreComments] = useState(false);
 
   useEffect(() => {
@@ -23,18 +22,13 @@ export default function Home() {
         "https://dev.elred.io/noSessionProfileDetails?userCode=66961e8dcc9a8155d09b8c9b"
       );
 
-      const metaDataResponse = await axios.post(
-        "https://dev.elred.io/noSessionPreviewCardScreenshot?userCode=66961e8dcc9a8155d09b8c9b"
-      );
-
       setData(dataResponse.data.result[0]);
-      setMetaData(metaDataResponse.data.result[0]);
     } catch (error) {
       console.error(error);
     }
   };
 
-  if (!data && !metaData) {
+  if (!data) {
     return (
       <div className="absolute top-0 right-0 bottom-0 left-0 flex items-center justify-center">
         <p className="text-2xl text-black">Loading....</p>
@@ -44,6 +38,7 @@ export default function Home() {
 
   const goToNextPage = () => {
     router.push("card");
+
     localStorage.setItem(
       "bgImage",
       data.profileDesignInfo.profileBannerImageURL
@@ -53,10 +48,6 @@ export default function Home() {
     localStorage.setItem("profileLastName", data.lastname);
     localStorage.setItem("profilePost", data.title[0].value);
     localStorage.setItem("profileLocation", data.address.fullAddress);
-
-    localStorage.setItem("metaDataURL", metaData.cardImageURL);
-    localStorage.setItem("metaDataText", metaData.profileTitle);
-    localStorage.setItem("metaDataTitle", metaData.cardTitle);
   };
 
   return (
@@ -123,9 +114,9 @@ export default function Home() {
       </div>
       <RWebShare
         data={{
-          text: metaData.profileTitle,
-          url: metaData.cardImageURL,
-          title: metaData.cardTitle,
+          text: "Hey Checkout Rachit's Card on elRed",
+          url: "https://task-elred-4chi40lzi-gupta258s-projects.vercel.app/",
+          title: "Professional",
         }}
         onClick={() => console.log("shared successfully!")}
       >

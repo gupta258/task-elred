@@ -9,7 +9,6 @@ export default function Card() {
   const router = useRouter();
 
   const [bgImage, setBgImage] = useState("");
-  const [metaData, setMetaData] = useState({});
   const [profileImage, setProfileImage] = useState("");
   const [profileFirstName, setProfileFirstName] = useState("");
   const [profileLastName, setProfileLastName] = useState("");
@@ -19,11 +18,6 @@ export default function Card() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       setBgImage(localStorage.getItem("bgImage"));
-      setMetaData({
-        text: localStorage.getItem("metaDataText"),
-        url: localStorage.getItem("metaDataURL"),
-        title: localStorage.getItem("metaDataTitle"),
-      });
       setProfileImage(localStorage.getItem("profileImage"));
       setProfileFirstName(localStorage.getItem("profileFirstName"));
       setProfileLastName(localStorage.getItem("profileLastName"));
@@ -65,7 +59,11 @@ export default function Card() {
           </button>
           <div className="flex items-center justify-end mb-6">
             <RWebShare
-              data={metaData}
+              data={{
+                text: "Hey Checkout Rachit's Card on elRed",
+                url: "https://task-elred-4chi40lzi-gupta258s-projects.vercel.app/",
+                title: "Professional",
+              }}
               onClick={() => console.log("shared successfully!")}
             >
               <button className="flex items-center gap-1 cursor-pointer">
