@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { RWebShare } from "react-web-share";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -7,10 +8,34 @@ import Image from "next/image";
 export default function Card() {
   const router = useRouter();
 
+  const [bgImage, setBgImage] = useState("");
+  const [metaData, setMetaData] = useState({});
+  const [profileImage, setProfileImage] = useState("");
+  const [profileFirstName, setProfileFirstName] = useState("");
+  const [profileLastName, setProfileLastName] = useState("");
+  const [profilePost, setProfilePost] = useState("");
+  const [profileLocation, setProfileLocation] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setBgImage(localStorage.getItem("bgImage"));
+      setMetaData({
+        text: localStorage.getItem("metaDataText"),
+        url: localStorage.getItem("metaDataURL"),
+        title: localStorage.getItem("metaDataTitle"),
+      });
+      setProfileImage(localStorage.getItem("profileImage"));
+      setProfileFirstName(localStorage.getItem("profileFirstName"));
+      setProfileLastName(localStorage.getItem("profileLastName"));
+      setProfilePost(localStorage.getItem("profilePost"));
+      setProfileLocation(localStorage.getItem("profileLocation"));
+    }
+  }, []);
+
   return (
     <div
       style={{
-        backgroundImage: `url('${localStorage.getItem("bgImage")}')`,
+        backgroundImage: `url('${bgImage}')`,
         backgroundSize: "100% 100%",
         backgroundPosition: "cover",
         height: "100vh",
@@ -27,7 +52,7 @@ export default function Card() {
         <div
           className="border border-[#909090] custom-gradient rounded-lg w-full px-5 pt-5 pb-16"
           style={{
-            backgroundImage: `url('${localStorage.getItem("bgImage")}')`,
+            backgroundImage: `url('${bgImage}')`,
             backgroundSize: "100% 100%",
             backgroundPosition: "cover",
           }}
@@ -40,11 +65,7 @@ export default function Card() {
           </button>
           <div className="flex items-center justify-end mb-6">
             <RWebShare
-              data={{
-                text: localStorage.getItem("metaDataText"),
-                url: localStorage.getItem("metaDataURL"),
-                title: localStorage.getItem("metaDataTitle"),
-              }}
+              data={metaData}
               onClick={() => console.log("shared successfully!")}
             >
               <button className="flex items-center gap-1 cursor-pointer">
@@ -61,7 +82,7 @@ export default function Card() {
           <div className="flex flex-col items-center justify-center">
             <div className="border-4 border-[#147BFF] rounded-full relative mb-6">
               <Image
-                src={localStorage.getItem("profileImage")}
+                src={profileImage}
                 width={116}
                 height={116}
                 alt="profile-pic"
@@ -77,18 +98,16 @@ export default function Card() {
             </div>
             <div className="flex flex-col items-center justify-center mb-[30px] gap-[2px]">
               <h4 className="font-bold text-[30px] leading-[35px] tracking-[3%]">
-                {localStorage.getItem("profileFirstName")}
+                {profileFirstName}
               </h4>
               <h6 className="font-semibold text-lg leading-[21px] tracking-[3%]">
-                {localStorage.getItem("profileLastName")}
+                {profileLastName}
               </h6>
             </div>
             <div className="flex flex-col items-center justify-center mb-[35px] gap-2 font-bold text-base leading-[19px] ">
-              <h4 className="tracking-[5%]">
-                {localStorage.getItem("profilePost")}
-              </h4>
+              <h4 className="tracking-[5%]">{profilePost}</h4>
               <h4 className="tracking-[5%]">WildCraft</h4>
-              <h6>{localStorage.getItem("profileLocation")}</h6>
+              <h6>{profileLocation}</h6>
             </div>
             <div className="flex flex-col items-center justify-center mb-[62px] gap-7">
               <Image
