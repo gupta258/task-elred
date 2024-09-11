@@ -1,101 +1,272 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { RWebShare } from "react-web-share";
 import Image from "next/image";
+import axios from "axios";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+  const [data, setData] = useState();
+  const [metaData, setMetaData] = useState();
+  const [moreComments, showMoreComments] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const dataResponse = await axios.post(
+        "https://dev.elred.io/noSessionProfileDetails?userCode=66961e8dcc9a8155d09b8c9b"
+      );
+
+      const metaDataResponse = await axios.post(
+        "https://dev.elred.io/noSessionPreviewCardScreenshot?userCode=66961e8dcc9a8155d09b8c9b"
+      );
+
+      setData(dataResponse.data.result[0]);
+      setMetaData(metaDataResponse.data.result[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (!data && !metaData) {
+    return (
+      <div className="absolute top-0 right-0 bottom-0 left-0 flex items-center justify-center">
+        <p className="text-2xl text-black">Loading....</p>
+      </div>
+    );
+  }
+
+  const goToNextPage = () => {
+    router.push("card");
+    localStorage.setItem(
+      "bgImage",
+      data.profileDesignInfo.profileBannerImageURL
+    );
+    localStorage.setItem("profileImage", data.dpURL);
+    localStorage.setItem("profileFirstName", data.firstname);
+    localStorage.setItem("profileLastName", data.lastname);
+    localStorage.setItem("profilePost", data.title[0].value);
+    localStorage.setItem("profileLocation", data.address.fullAddress);
+
+    localStorage.setItem("metaDataURL", metaData.cardImageURL);
+    localStorage.setItem("metaDataText", metaData.profileTitle);
+    localStorage.setItem("metaDataTitle", metaData.cardTitle);
+  };
+
+  return (
+    <div
+      style={{
+        backgroundImage: `url('${data.profileDesignInfo.profileBannerImageURL}')`,
+        backgroundSize: "100% 100%",
+        backgroundPosition: "cover",
+        height: "100%",
+      }}
+      className="text-white pb-7"
+    >
+      <div className="px-5 py-[10px] bg-white bg-opacity-20">
+        <p className="font-medium text-base leading-6 -tracking-[1.9%] ">
+          Profile
+        </p>
+      </div>
+      <div className="px-5 mt-[67px] flex flex-col items-start">
+        <Image
+          src={data.dpURL}
+          width={60}
+          height={60}
+          alt="profile-pic"
+          className="border-2 border-white rounded-full mb-[10px]"
+        />
+        <div className="flex flex-col items-start mb-20">
+          <div className="flex items-center gap-[5px]">
+            <h6 className="text-2xl font-medium leading-7">
+              {data.firstname} {data.lastname}
+            </h6>
             <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
+              src={"./ic_round-verified.svg"}
               width={20}
               height={20}
+              alt="verified"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
+          <div className="flex items-center gap-2 mt-[9px]">
+            <Image src={"./briefcase.svg"} width={16} height={16} alt="post" />
+            <p className="text-lg font-medium leading-[22px] capitalize">
+              {data.title[0].value}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <Image
+              src={"./location.svg"}
+              width={12}
+              height={16}
+              alt="location"
+            />
+            <p className="text-lg font-medium leading-[22px] capitalize">
+              {data.address.fullAddress}
+            </p>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <Image
+          src={"/fullImage.png"}
+          width={56}
+          height={85}
+          alt="fullImage"
+          className="cursor-pointer"
+          onClick={goToNextPage}
+        />
+      </div>
+      <RWebShare
+        data={{
+          text: metaData.profileTitle,
+          url: metaData.cardImageURL,
+          title: metaData.cardTitle,
+        }}
+        onClick={() => console.log("shared successfully!")}
+      >
+        <div className="bg-white bg-opacity-20 mx-4 py-4 rounded-xl custom-shadow mt-[26px] flex flex-col items-center justify-center cursor-pointer">
           <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+            src={"./share.svg"}
+            width={36}
+            height={36}
+            alt="share"
+            className="mb-2"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <p className="text-xs font-medium leading-[14px]">Share</p>
+        </div>
+      </RWebShare>
+      <div className="mt-4 bg-white bg-opacity-20 mx-4 p-4 rounded-xl custom-shadow">
+        <h6 className="font-medium text-lg leading-[22px] mb-4">Ratings</h6>
+        <div className="px-2">
+          <div className="flex items-start gap-8">
+            <p className="text-xl font-medium leading-6">57</p>
+            <p className="text-xs font-medium leading-[18px]">
+              Has ethical code of conduct and is safe to do bussines with
+            </p>
+          </div>
+          <div className="border-[0.4px] border-white border-opacity-30 mt-2 mb-8" />
+          <div className="flex items-center gap-8">
+            <p className="text-xl font-medium leading-6">27</p>
+            <p className="text-xs font-medium leading-[18px]">
+              Met In real life/Video call
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="mt-4 bg-white bg-opacity-20 mx-4 p-4 rounded-xl custom-shadow h-[250px] overflow-scroll">
+        <div className="flex items-center justify-between mb-4">
+          <h6 className="font-medium text-lg leading-[22px]">Comments</h6>
+          <p className="font-medium text-base leading-[20px]">See all</p>
+        </div>
+        <div className="flex flex-col items-center gap-[22px]">
+          <div className="flex items-start gap-2">
+            <Image
+              src={"./comments-one.svg"}
+              width={42}
+              height={42}
+              alt="comment-one"
+            />
+            <div>
+              <p className="font-medium text-sm leading-[21px] mb-[6px]">
+                Gwen Stacy{" "}
+                <span className="opacity-60">See you in the next event</span>{" "}
+                @roger vaccaro
+              </p>
+              <div className="flex items-center gap-4 font-medium text-[13px] leading-[16px] opacity-60">
+                <p>1s</p>
+                <p>241 likes</p>
+                <p>Reply</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Image
+              src={"./comments-two.svg"}
+              width={42}
+              height={42}
+              alt="comment-two"
+            />
+            <div>
+              <p className="font-medium text-sm leading-[21px] mb-[6px]">
+                Gwen Stacy{" "}
+                <span className="opacity-60">
+                  Never judge a book by its cover
+                </span>
+              </p>
+              <div className="flex items-center gap-4 font-medium text-[13px] leading-[16px] opacity-60">
+                <p>1s</p>
+                <p>241 likes</p>
+                <p>Reply</p>
+              </div>
+            </div>
+          </div>
+          {moreComments ? (
+            <>
+              <div className="flex items-start gap-2">
+                <Image
+                  src={"./comments-one.svg"}
+                  width={42}
+                  height={42}
+                  alt="comment-one"
+                />
+                <div>
+                  <p className="font-medium text-sm leading-[21px] mb-[6px]">
+                    Gwen Stacy{" "}
+                    <span className="opacity-60">
+                      See you in the next event
+                    </span>{" "}
+                    @roger vaccaro
+                  </p>
+                  <div className="flex items-center gap-4 font-medium text-[13px] leading-[16px] opacity-60">
+                    <p>1s</p>
+                    <p>241 likes</p>
+                    <p>Reply</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <Image
+                  src={"./comments-two.svg"}
+                  width={42}
+                  height={42}
+                  alt="comment-two"
+                />
+                <div>
+                  <p className="font-medium text-sm leading-[21px] mb-[6px]">
+                    Gwen Stacy{" "}
+                    <span className="opacity-60">
+                      Never judge a book by its cover
+                    </span>
+                  </p>
+                  <div className="flex items-center gap-4 font-medium text-[13px] leading-[16px] opacity-60">
+                    <p>1s</p>
+                    <p>241 likes</p>
+                    <p>Reply</p>
+                  </div>
+                </div>
+              </div>
+              <button
+                className="flex items-center justify-center font-medium text-xs leading-[14px] opacity-60 cursor-pointer"
+                onClick={() => showMoreComments(false)}
+              >
+                ----- Hide 2 replies
+              </button>
+            </>
+          ) : (
+            <button
+              className="flex items-center justify-center font-medium text-xs leading-[14px] opacity-60 cursor-pointer"
+              onClick={() => showMoreComments(true)}
+            >
+              ----- View 2 more replies
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
