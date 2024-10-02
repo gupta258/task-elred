@@ -1,4 +1,5 @@
 import localFont from "next/font/local";
+import { customMetaDataGenerator } from "@/lib/customMetaDataGenerator";
 import "./globals.css";
 
 const avenir = localFont({
@@ -6,31 +7,9 @@ const avenir = localFont({
   variable: "--font-avenir",
 });
 
-export const metadata = {
+export const metadata = customMetaDataGenerator({
   title: "Professional",
-  description: "Hey Checkout Rachit's Card on elRed",
-  openGraph: {
-    title: "Professional",
-    description: "Hey Checkout Rachit's Card on elRed",
-    images: [
-      {
-        url: "/fullImage.png",
-        width: 800,
-        height: 600,
-        alt: "Professional Card Image",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Professional",
-    description: "Hey Checkout Rachit's Card on elRed",
-    images: ["/fullImage.png"],
-  },
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+});
 
 export default function RootLayout({ children }) {
   return (
